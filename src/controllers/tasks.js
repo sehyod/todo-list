@@ -41,11 +41,16 @@ async function listTasks(req, res) {
 }
 
 async function editTask(req, res) {
-  await tasksModel.update(req.params.id, {
-    name: req.body.name,
-    start_date: new Date(req.body.start_date),
-    due_date: new Date(req.body.due_date),
-  });
+  const attributesToUpdate = { ...req.body };
+  // Only update start_date and due_date if the corresponding fields have been passed in the request
+  if (req.body.start_date) {
+    attributesToUpdate.start_date = new Date(req.body.start_date);
+  }
+  if (req.body.due_date) {
+    attributesToUpdate.due_date = new Date(req.body.due_date);
+  }
+
+  await tasksModel.update(req.params.id, attributesToUpdate);
 
   res.sendStatus(204);
 }
