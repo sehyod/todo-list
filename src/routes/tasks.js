@@ -8,18 +8,33 @@ const {
   toggleTaskState,
 } = require("../controllers/tasks");
 const {
-  isTaskIdValid,
-  isFilteringQueryValid,
+  isIdValid,
+  isTaskFilteringQueryValid,
   isSortingQueryValid,
-  validateTask,
-} = require("../middlewares/tasks");
+  validateBody,
+} = require("../middlewares/validators");
+const tasksModel = require("../models/tasks");
 
 const router = express.Router();
 
-router.post("/", validateTask(true), createTask);
-router.get("/", isFilteringQueryValid, isSortingQueryValid, listTasks);
-router.put("/:id", validateTask(false), isTaskIdValid, editTask);
-router.delete("/:id", isTaskIdValid, deleteTask);
-router.patch("/:id/status", isTaskIdValid, toggleTaskState);
+router.post(
+  "/",
+  validateBody(["name", "start_date", "due_date"], ["project_id"]),
+  createTask
+);
+router.get(
+  "/",
+  isTaskFilteringQueryValid(),
+  isSortingQueryValid(["start_date", "due_date", "done_date"]),
+  listTasks
+);
+router.put(
+  "/:id",
+  validateBody([], ["name", "start_date", "due_date", "project_id"]),
+  isIdValid(tasksModel, "task"),
+  editTask
+);
+router.delete("/:id", isIdValid(tasksModel, "task"), deleteTask);
+router.patch("/:id/status", isIdValid(tasksModel, "task"), toggleTaskState);
 
 module.exports = router;
