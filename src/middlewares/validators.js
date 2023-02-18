@@ -25,10 +25,10 @@ function validateBody(mandatoryFields, optionalFields = []) {
   };
 }
 
-function isIdValid({ fieldName = "id", model, documentName }) {
+function isIdValid({ paramName = "id", model, documentName }) {
   return async (req, res, next) => {
     try {
-      const document = await model.get(req.params[fieldName]);
+      const document = await model.get(req.params[paramName]);
       if (!document) {
         res.status(404).send(`This ${documentName} does not exist.`);
         return;

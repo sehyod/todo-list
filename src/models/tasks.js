@@ -25,7 +25,7 @@ async function list(filter = {}, sortBy = {}) {
   const result = await getClient()
     .db()
     .collection("tasks")
-    .find({ ...filter })
+    .find(filter)
     .sort(sortBy)
     .toArray();
 
@@ -50,10 +50,41 @@ async function del(id) {
   return result;
 }
 
+async function listByProjectName(projectName, filter, sortBy) {
+  const regex = new RegExp(projectName, "gi");
+  const aggregationPipeline = [
+    { $match: filter || {} },
+    { $group: { _id: "$project_id", tasks: { $push: "$$ROOT" } } },
+    {
+      $lookup: {
+        from: "projects",
+        localField: "_id",
+        foreignField: "_id",
+        as: "project",
+      },
+    },
+    { $match: { "project.name": { $regex: regex } } },
+    { $project: { tasks: 1 } },
+  ];
+
+  if (Object.keys(sortBy).length > 0) {
+    aggregationPipeline.push({ $sort: sortBy });
+  }
+
+  const result = await getClient()
+    .db()
+    .collection("tasks")
+    .aggregate(aggregationPipeline)
+    .toArray();
+
+  return result;
+}
+
 module.exports = {
   get,
   create,
   list,
   update,
   del,
+  listByProjectName,
 };

@@ -8,7 +8,6 @@ const {
 } = require("../controllers/projects");
 const {
   isIdValid,
-  isTaskFilteringQueryValid,
   isSortingQueryValid,
   validateBody,
 } = require("../middlewares/validators");
@@ -25,12 +24,12 @@ router.get("/", isSortingQueryValid(["start_date", "due_date"]), listProjects);
 router.put(
   "/:id",
   validateBody([], ["name", "start_date", "due_date"]),
-  isIdValid({ projectsModel, documentName: "project" }),
+  isIdValid({ model: projectsModel, documentName: "project" }),
   editProject
 );
 router.delete(
   "/:id",
-  isIdValid({ projectsModel, documentName: "project" }),
+  isIdValid({ model: projectsModel, documentName: "project" }),
   deleteProject
 );
 

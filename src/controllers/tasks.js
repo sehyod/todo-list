@@ -1,4 +1,5 @@
 const tasksModel = require("../models/tasks");
+const projectsModel = require("../models/projects");
 
 async function createTask(req, res) {
   await tasksModel.create({
@@ -16,7 +17,7 @@ async function listTasks(req, res) {
 
   // Add filtering by status
   if (req.query?.status) {
-    filter = { done: req.query?.status === "done" };
+    filter = { ...filter, done: req.query?.status === "done" };
   }
 
   // Add search by name
@@ -35,7 +36,17 @@ async function listTasks(req, res) {
     };
   }
 
-  const result = await tasksModel.list(filter, sortBy);
+  let result;
+  // If there is a filter on the project name, we use the aggregation with the projects collection
+  if (req.query?.project_name) {
+    result = await tasksModel.listByProjectName(
+      req.query.project_name,
+      filter,
+      sortBy
+    );
+  } else {
+    result = await tasksModel.list(filter, sortBy);
+  }
 
   res.status(200).send(result);
 }
@@ -82,8 +93,8 @@ async function toggleTaskStatus(req, res) {
   res.sendStatus(204);
 }
 
-async function assignTaskProject() {
-  tasksModel.update(req.task._id, { project_id: req.project._id });
+async function assignTaskProject(req, res) {
+  await tasksModel.update(req.task._id, { project_id: req.project._id });
 
   res.sendStatus(204);
 }

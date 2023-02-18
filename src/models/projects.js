@@ -25,7 +25,7 @@ async function list(filter = {}, sortBy = {}) {
   const result = await getClient()
     .db()
     .collection("projects")
-    .find({ ...filter })
+    .find(filter)
     .sort(sortBy)
     .toArray();
 
@@ -50,10 +50,19 @@ async function del(id) {
   return result;
 }
 
+// async function test(project_name) {
+//   const result = await getClient()
+//     .db()
+//     .collection("projects")
+//     .find({ name: { $regex: new RegExp(project_name, "gi") } })
+//     .;
+// }
+
 module.exports = {
   get,
   create,
   list,
   update,
   del,
+  // test,
 };
