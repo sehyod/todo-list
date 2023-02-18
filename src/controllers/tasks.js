@@ -50,18 +50,18 @@ async function editTask(req, res) {
     attributesToUpdate.due_date = new Date(req.body.due_date);
   }
 
-  await tasksModel.update(req.params.id, attributesToUpdate);
+  await tasksModel.update(req.task._id, attributesToUpdate);
 
   res.sendStatus(204);
 }
 
 async function deleteTask(req, res) {
-  await tasksModel.del(req.params.id);
+  await tasksModel.del(req.task._id);
 
   res.sendStatus(204);
 }
 
-async function toggleTaskState(req, res) {
+async function toggleTaskStatus(req, res) {
   let attributesToUpdate;
   if (req.task.done) {
     // If the task was already done, we mark it as to-do and reset the start and done dates
@@ -77,7 +77,13 @@ async function toggleTaskState(req, res) {
       done_date: new Date(),
     };
   }
-  await tasksModel.update(req.params.id, attributesToUpdate);
+  await tasksModel.update(req.task._id, attributesToUpdate);
+
+  res.sendStatus(204);
+}
+
+async function assignTaskProject() {
+  tasksModel.update(req.task._id, { project_id: req.project._id });
 
   res.sendStatus(204);
 }
@@ -87,5 +93,6 @@ module.exports = {
   listTasks,
   editTask,
   deleteTask,
-  toggleTaskState,
+  toggleTaskStatus,
+  assignTaskProject,
 };

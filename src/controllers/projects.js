@@ -44,13 +44,13 @@ async function editProject(req, res) {
     attributesToUpdate.due_date = new Date(req.body.due_date);
   }
 
-  await projectsModel.update(req.params.id, attributesToUpdate);
+  await projectsModel.update(req.project._id, attributesToUpdate);
 
   res.sendStatus(204);
 }
 
 async function deleteProject(req, res) {
-  await projectsModel.del(req.params.id);
+  await projectsModel.del(req.project._id);
 
   res.sendStatus(204);
 }

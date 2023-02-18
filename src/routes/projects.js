@@ -25,9 +25,13 @@ router.get("/", isSortingQueryValid(["start_date", "due_date"]), listProjects);
 router.put(
   "/:id",
   validateBody([], ["name", "start_date", "due_date"]),
-  isIdValid(projectsModel, "project"),
+  isIdValid({ projectsModel, documentName: "project" }),
   editProject
 );
-router.delete("/:id", isIdValid(projectsModel, "project"), deleteProject);
+router.delete(
+  "/:id",
+  isIdValid({ projectsModel, documentName: "project" }),
+  deleteProject
+);
 
 module.exports = router;
