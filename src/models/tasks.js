@@ -65,6 +65,8 @@ async function listByProjectName(projectName, filter, sortBy) {
     },
     { $match: { "project.name": { $regex: regex } } },
     { $project: { tasks: 1 } },
+    { $unwind: "$tasks" },
+    { $replaceRoot: { newRoot: "$tasks" } },
   ];
 
   if (Object.keys(sortBy).length > 0) {
