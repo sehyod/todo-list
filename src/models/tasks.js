@@ -53,8 +53,11 @@ async function del(id) {
 async function listByProjectName(projectName, filter, sortBy) {
   const regex = new RegExp(projectName, "gi");
   const aggregationPipeline = [
-    { $match: filter || {} },
+    // Applying query filter and filter out tasks that do not belong to a project
+    { $match: { ...(filter || {}), project_id: { $ne: null } } },
+    // Group tasks by project
     { $group: { _id: "$project_id", tasks: { $push: "$$ROOT" } } },
+    // Fetch corresponding project documents
     {
       $lookup: {
         from: "projects",
@@ -63,7 +66,10 @@ async function listByProjectName(projectName, filter, sortBy) {
         as: "project",
       },
     },
+    { $unwind: "$project" },
+    // Filter to keep only projects with the requested name
     { $match: { "project.name": { $regex: regex } } },
+    // Return the task documents
     { $project: { tasks: 1 } },
     { $unwind: "$tasks" },
     { $replaceRoot: { newRoot: "$tasks" } },
