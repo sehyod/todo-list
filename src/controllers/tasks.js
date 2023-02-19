@@ -4,8 +4,8 @@ const projectsModel = require("../models/projects");
 async function createTask(req, res) {
   await tasksModel.create({
     name: req.body.name,
-    start_date: new Date(req.body.start_date),
-    due_date: new Date(req.body.due_date),
+    startDate: new Date(req.body.start_date),
+    dueDate: new Date(req.body.due_date),
   });
 
   res.sendStatus(204);
